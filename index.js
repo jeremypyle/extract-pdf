@@ -4,6 +4,10 @@ const puppeteer = require('puppeteer');
 const app = express();
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the PDF Extraction Service!');
+});
+
 app.post('/extractPdfLink', async (req, res) => {
   const { url } = req.body;
 
@@ -17,14 +21,11 @@ app.post('/extractPdfLink', async (req, res) => {
     const page = await browser.newPage();
     await page.goto(url);
 
-    // Wait for the button to be visible and click it
     await page.waitForSelector('#downloadPdf button');
     await page.click('#downloadPdf button');
 
-    // Wait for some time for the download to process
     await page.waitForTimeout(3000);
 
-    // Extract the download link if available in the DOM
     const pdfLink = await page.evaluate(() => {
       const anchor = document.querySelector('a[href$=".pdf"]');
       return anchor ? anchor.href : null;
